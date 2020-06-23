@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <link rel="stylesheet" href="../style.css">
+  <!-- <link rel="stylesheet" href="../style.css"> -->
 </head>
 <body>
   <div id="app">
-    <nav-btns></nav-btns>
+    <!-- <nav-btns></nav-btns> -->
     <h1>Home page</h1>
     <p>Welcome to the home page.</p>
     <h3>Chat:</h3>
@@ -23,9 +23,30 @@
     <button v-on:click="connect">Re-connect</button>
     <button v-on:click="disconnect">Disconnect</button>
   </div>
+  <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-  <script src="../nav.js"></script>
+  <!-- <script src="../nav.js"></script> -->
   <script>
+    var socket = io();
+    socket.on('message',(msg)=>{
+      console.log('Server says: ' + msg)
+    })
+    function sendMessage(){
+      var msg = prompt('What do you want to say?')
+      socket.emit('message',msg);
+      console.log('You have sent the server: ' + msg)
+    }
+
+    function connect() {
+      var socket = io()
+      console.log('You have connected to the server.')
+    };
+
+    function disconnect(){
+      socket.emit('end') //da li je dobro ovo ovde io(). Ne znam kako da socket radi
+      console.log('user disconnected from server')
+      }
+
     var app = new Vue({
       el:'#app',
       data: function(){
