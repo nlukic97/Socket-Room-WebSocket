@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div id="app">
+    <nav-btns></nav-btns>
+    <h1>Home page</h1>
+    <p>Welcome to the home page.</p>
+    <h3>Chat:</h3>
+    <ul>
+      <li class="you"><span class="bold">You: </span>{{sentMessage[0]}}</li>
+      <li class="other"><span class="bold">Server: </span>{{recievedMessage[0]}}</li>
+      <!-- <p>{{recievedMessage[2]}}</p> -->
+    </ul>
+    <button v-on:click="sendMessage">Send server message</button>
+    <button v-on:click="connect">Re-connect</button>
+    <button v-on:click="disconnect">Disconnect</button>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="../nav.js"></script>
+  <script>
+    var app = new Vue({
+      el:'#app',
+      data: function(){
+        return { 
+          socket: null, //this is done by the mounted state
+          sentMessage:[
+            'Hello server!',
+            'Whats up server?'
+          ],
+          recievedMessage:[
+            'Hello',
+            'Eeee'
+          ],
+          message: "No message from server yet."
+        }
+      },
+      methods: {
+        sendMessage(){
+          var newMsg = 'Hardcoded message';
+          console.log("message sent to server: " + newMsg)
+          console.log('-------------------------');
+          this.socket.send(newMsg);
+
+
+          var chatBox = document.querySelector('ul')
+          var newLi = document.createElement('li');
+          var span = document.createElement('span')
+          span.classList.add('bold')
+          span.appendChild(document.createTextNode('You: '))
+          var text = document.createTextNode(newMsg);
+          newLi.appendChild(span);
+          newLi.appendChild(text);
+          newLi.classList.add('you')
+          document.querySelector('ul').appendChild(newLi);
+        },
+        disconnect(){
+          this.socket.close()
+          this.socket.addEventListener('close',function(){
+            console.log("You have just disconnected yourself from the server") //samo kad se diskonekcija odradi
+            console.log('-------------------------');
+          })
+          
+        },
+        connect(){ //used in the mounted state to initialise the server
+          this.socket = '';
+          this.socket = new WebSocket('ws://localhost:3200')
+
+          this.socket.addEventListener('open',function(){
+            console.log("You are connected to the server.")
+            console.log('-------------------------');
+          });
+
+          this.socket.addEventListener('message',function(msg){
+            console.log("message recieved from server: " + msg.data);
+            console.log('-------------------------');
+            //this.recievedMessage.push('msg.data') // ne radi uopste, i mustaci se ne bi ni menjali.
+
+            var chatBox = document.querySelector('ul')
+            var newLi = document.createElement('li');
+            var span = document.createElement('span')
+            span.classList.add('bold')
+            span.appendChild(document.createTextNode('Server: '))
+            var text = document.createTextNode(msg.data);
+            newLi.appendChild(span);
+            newLi.appendChild(text);
+            newLi.classList.add('other')
+            document.querySelector('ul').appendChild(newLi);
+          })
+          //https://www.tutorialspoint.com/How-to-reconnect-to-websocket-after-close-connection-with-HTML
+        }
+      },
+      mounted() {
+        this.connect()
+      }
+    })
+  </script>
+</body>
+</html>
