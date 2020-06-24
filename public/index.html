@@ -26,19 +26,21 @@
     socket.on('message',(msg)=>{
       console.log('Server says: ' + msg)
     })
+    
+    function connect() {
+      var socket = io()
+      console.log('You have connected to the server.');
+      //Vise ne stizu poruke do servera kada kliknem send server message, tj ovo konektovanje ne radi posao.
+    };
+    
     function sendMessage(){
       var msg = prompt('What do you want to say?')
-      socket.emit('message',msg);
+      socket.emit('message', msg); //da bi radilo slanje i primanje poruka nakon disconnect i connect, ovde mora stajati io(). Ali onda samo konektuje server cim pokusam da posaljesm poruku, jer definisem ovo io
       console.log('You have sent the server: ' + msg)
     }
 
-    function connect() {
-      var socket = io()
-      console.log('You have connected to the server.')
-    };
-
     function disconnect(){
-      socket.emit('end') //da li je dobro ovo ovde io(). Ne znam kako da socket radi
+      socket.emit('end')
       console.log('user disconnected from server')
       }
       

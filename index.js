@@ -20,6 +20,7 @@ io.on('connection',(socket)=>{
   socket.on('disconnect',()=>{
     console.log('user has disconected.')
   })
+
   socket.on('end',()=>{
     socket.disconnect(0)
   })
