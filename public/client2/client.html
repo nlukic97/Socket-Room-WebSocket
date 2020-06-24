@@ -17,9 +17,9 @@
       <li class="other"><span class="bold">Server: </span>{{recievedMessage[0]}}</li>
       <!-- <p>{{recievedMessage[2]}}</p> -->
     </ul>
-    <button v-on:click="sendMessage">Send server message</button>
-    <button v-on:click="connect">Re-connect</button>
-    <button v-on:click="disconnect">Disconnect</button>
+    <button onclick="sendMessage()">Send server message</button>
+    <button onclick="connect()">Re-connect</button>
+    <button onclick="disconnect()">Disconnect</button>
   </div>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
@@ -27,21 +27,44 @@
   <script>
     var socket = io();
     socket.on('message',(msg)=>{
-      console.log('Server says: ' + msg)
+      console.log('Server says: ' + msg);
+      var chatBox = document.querySelector('ul')
+            var newLi = document.createElement('li');
+            var span = document.createElement('span')
+            span.classList.add('bold')
+            span.appendChild(document.createTextNode('Server: '))
+            var text = document.createTextNode(msg);
+            newLi.appendChild(span);
+            newLi.appendChild(text);
+            newLi.classList.add('other')
+            document.querySelector('ul').appendChild(newLi);    
     })
-    function sendMessage(){
-      var msg = prompt('What do you want to say?')
-      socket.emit('message',msg);
-      console.log('You have sent the server: ' + msg)
-    }
-
+    
     function connect() {
       var socket = io()
-      console.log('You have connected to the server.')
+      console.log('You have connected to the server.');
+      //Vise ne stizu poruke do servera kada kliknem send server message, tj ovo konektovanje ne radi posao.
     };
+    
+    function sendMessage(){
+      var msg = 'Hardcoded message'
+      socket.emit('message', msg); //da bi radilo slanje i primanje poruka nakon disconnect i connect, ovde mora stajati io(). Ali onda samo konektuje server cim pokusam da posaljesm poruku, jer definisem ovo io
+      console.log('You have sent the server: ' + msg);
+
+      var chatBox = document.querySelector('ul')
+          var newLi = document.createElement('li');
+          var span = document.createElement('span')
+          span.classList.add('bold')
+          span.appendChild(document.createTextNode('You: '))
+          var text = document.createTextNode(msg);
+          newLi.appendChild(span);
+          newLi.appendChild(text);
+          newLi.classList.add('you')
+          document.querySelector('ul').appendChild(newLi);
+    }
 
     function disconnect(){
-      socket.emit('end') //da li je dobro ovo ovde io(). Ne znam kako da socket radi
+      socket.emit('end')
       console.log('user disconnected from server')
       }
 
@@ -60,64 +83,6 @@
           ],
           message: "No message from server yet."
         }
-      },
-      methods: {
-        sendMessage(){
-          var newMsg = 'Hardcoded message';
-          console.log("message sent to server: " + newMsg)
-          console.log('-------------------------');
-          this.socket.send(newMsg);
-
-
-          var chatBox = document.querySelector('ul')
-          var newLi = document.createElement('li');
-          var span = document.createElement('span')
-          span.classList.add('bold')
-          span.appendChild(document.createTextNode('You: '))
-          var text = document.createTextNode(newMsg);
-          newLi.appendChild(span);
-          newLi.appendChild(text);
-          newLi.classList.add('you')
-          document.querySelector('ul').appendChild(newLi);
-        },
-        disconnect(){
-          this.socket.close()
-          this.socket.addEventListener('close',function(){
-            console.log("You have just disconnected yourself from the server") //samo kad se diskonekcija odradi
-            console.log('-------------------------');
-          })
-          
-        },
-        connect(){ //used in the mounted state to initialise the server
-          this.socket = '';
-          this.socket = new WebSocket('ws://localhost:3200')
-
-          this.socket.addEventListener('open',function(){
-            console.log("You are connected to the server.")
-            console.log('-------------------------');
-          });
-
-          this.socket.addEventListener('message',function(msg){
-            console.log("message recieved from server: " + msg.data);
-            console.log('-------------------------');
-            //this.recievedMessage.push('msg.data') // ne radi uopste, i mustaci se ne bi ni menjali.
-
-            var chatBox = document.querySelector('ul')
-            var newLi = document.createElement('li');
-            var span = document.createElement('span')
-            span.classList.add('bold')
-            span.appendChild(document.createTextNode('Server: '))
-            var text = document.createTextNode(msg.data);
-            newLi.appendChild(span);
-            newLi.appendChild(text);
-            newLi.classList.add('other')
-            document.querySelector('ul').appendChild(newLi);
-          })
-          //https://www.tutorialspoint.com/How-to-reconnect-to-websocket-after-close-connection-with-HTML
-        }
-      },
-      mounted() {
-        this.connect()
       }
     })
   </script>
