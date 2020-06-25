@@ -28,7 +28,7 @@
   <!-- <script src="../nav.js"></script> -->
   <script>
     var socket = io();
-    socket.on('message',(msg)=>{
+    socket.on('message1',(msg)=>{
       console.log('Server says: ' + msg);
 
       var chatBox = document.querySelector('ul')
@@ -41,12 +41,31 @@
             newLi.appendChild(text);
             newLi.classList.add('other')
             document.querySelector('ul').appendChild(newLi);
-    })
+      })
     
     function connect() {
-      var socket = io()
+      socket = io().connect()
       console.log('You have connected to the server.');
       //Vise ne stizu poruke do servera kada kliknem send server message, tj ovo konektovanje ne radi posao.
+      socket.on('message1',(msg)=>{
+      console.log('Server says: ' + msg);
+
+
+        ////////////////////////////////////////////////////////////////////////////////////
+      var chatBox = document.querySelector('ul')
+            var newLi = document.createElement('li');
+            var span = document.createElement('span')
+            span.classList.add('bold')
+            span.appendChild(document.createTextNode('Server: '))
+            var text = document.createTextNode(msg);
+            newLi.appendChild(span);
+            newLi.appendChild(text);
+            newLi.classList.add('other')
+            document.querySelector('ul').appendChild(newLi);
+      })
+      ////////////////////////////////////////////////////////////////////////////////////
+
+      
     };
     
     //listening for enter press
@@ -76,7 +95,7 @@
     }
 
     function disconnect(){
-      socket.emit('end')
+      socket.disconnect();
       console.log('user disconnected from server')
       }
 
